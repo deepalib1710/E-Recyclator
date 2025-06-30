@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>E-Recyclator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <style>
+        /* Add this to your existing styles */
+        :root {
+            /* Font Family */
+            --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-secondary: 'Georgia', serif;
+            
+            /* Font Sizes - Modular scale 1.25 */
+            --text-xs: 0.8rem;    /* 12.8px */
+            --text-sm: 1rem;      /* 16px */
+            --text-md: 1.25rem;   /* 20px */
+            --text-lg: 1.563rem;  /* 25px */
+            --text-xl: 1.953rem;  /* 31.25px */
+            --text-xxl: 2.441rem; /* 39px */
+            
+            /* Line Heights */
+            --heading-line-height: 1.3;
+            --body-line-height: 1.6;
+        }
+        
+        body {
+            /* Base Typography */
+            font-family: var(--font-primary);
+            font-size: 1rem;
+            line-height: var(--body-line-height);
+            font-weight: 400;
+            color: #333;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Typography Hierarchy */
+        h1, .h1 {
+            font-size: var(--text-xxl);
+            line-height: var(--heading-line-height);
+            font-weight: 800;
+            margin: 2rem 0 1rem;
+        }
+        
+        h2, .h2 {
+            font-size: var(--text-xl);
+            line-height: var(--heading-line-height);
+            font-weight: 700;
+            margin: 1.5rem 0 1rem;
+        }
+        
+        h3, .h3 {
+            font-size: var(--text-lg);
+            line-height: var(--heading-line-height);
+            font-weight: 600;
+            margin: 1.25rem 0 0.75rem;
+        }
+        
+        p {
+            font-size: var(--text-sm);
+            margin-bottom: 1.5rem;
+            max-width: 65ch; /* Optimal reading width */
+        }
+        
+        /* Special Cases */
+        .content-card {
+            font-size: var(--text-sm);
+            line-height: 1.5;
+        }
+        
+        .stat-number {
+            font-family: var(--font-primary);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .warning-box {
+            font-size: var(--text-sm);
+            font-weight: 500;
+        }
+        
+        /* Responsive Typography */
+        @media screen and (min-width: 768px) {
+            :root {
+                --text-xs: 0.9rem;    /* 14.4px */
+                --text-sm: 1.125rem;  /* 18px */
+                --text-md: 1.406rem;  /* 22.5px */
+                --text-lg: 1.758rem;  /* 28px */
+                --text-xl: 2.197rem;   /* 35px */
+                --text-xxl: 2.746rem; /* 44px */
+            }
+            
+            body {
+                line-height: 1.7;
+            }
+        }
+        
+        @media screen and (min-width: 1200px) {
+            :root {
+                --text-base: 1.2rem;
+            }
+        }
+        
+        /* Add this to your head section */
+       </style>
+
+       
+    <style>
+        :root {
+            --primary-color: #6d9b6f;
+            --secondary-color: #7ad27e;
+            --accent-color: #d6a059;
+            --light-color: #f1f8e9;
+            --dark-color: #8eac8f;
+            --nav-hover: #47d587;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-color);
+            color: #333;
+        }
+
+        h1, h2, h3 {
+            color: var(--dark-color);
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar a, .dropbtn {
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            border: none;
+        }
+
+        .navbar a:hover, .dropdown:hover .dropbtn {
+            background-color: var(--nav-hover);
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a, .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            display: block;
+            width: 100%;
+            border: none;
+            background: none;
+            text-align: left;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .content-section {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .calculator input, .calculator select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .calculator button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .calculator button:hover {
+            background-color: #e65100;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+        }
+
+        .contact {
+            padding: 12px 16px;
+            white-space: nowrap;
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .map-controls {
+            margin: 15px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .map-controls button {
+            padding: 8px 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .map-controls button:hover {
+            background-color: var(--nav-hover);
+        }
+
+        .route-controls {
+            margin: 15px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .route-controls input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        .route-controls button {
+            padding: 8px 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .route-controls button:hover {
+            background-color: #e65100;
+        }
+
+        .facility-list {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .facility-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .facility-item:hover {
+            background-color: var(--light-color);
+        }
+
+        .facility-item.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .facility-details {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .facility-item.active .facility-details {
+            color: #eee;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+            }
+
+            #map {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center; background-color: var(--primary-color); color:white; padding: 20px;">E-Recyclator</h1>
+
+    <div class="navbar">
+        <a onclick="showSection('home')">Home</a>
+        <div class="dropdown">
+            <button class="dropbtn">Services</button>
+            <div class="dropdown-content">
+                <a onclick="showSection('calculator')">Carbon Footprint Calculator</a>
+                <a onclick="showSection('facilityLocator')">Facility Locator</a>
+            </div>
+        </div>
+        <a onclick="showSection('faqs')">FAQs</a>
+        <div class="dropdown">
+            <button class="dropbtn">Contact Us</button>
+            <div class="dropdown-content">
+                <div class="contact">
+                    Dial us at: 8510985348<br>
+                    Write to us at: <a href="mailto:escrapcollection@gmail.com">escrapcollection@gmail.com</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sections -->
+    <div id="home" class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">E-Waste Crisis in India</h2>
+            <div class="title-decoration"></div>
+        </div>
+        
+        <div class="grid-layout">
+            <div class="content-card">
+                <div class="card-header">
+                    <i class="fas fa-trash-alt card-icon"></i>
+                    <h3>India's E-Waste Challenge</h3>
+                </div>
+                <p class="highlight">India ranks 3rd globally in e-waste generation after China and the USA. Key statistics:</p>
+                
+                <div class="stats-container">
+                    <div class="stat-box india-stat">
+                        <div class="stat-number">3.2 MMT</div>
+                        <div class="stat-text">E-waste generated in 2023<br>(65% increase since 2018)</div>
+                    </div>
+    
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <i class="fas fa-chart-line stat-icon"></i>
+                            <div>31% CAGR</div>
+                            <small>Growth rate (2018-2023)</small>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-recycle stat-icon"></i>
+                            <div>10-15%</div>
+                            <small>Formally recycled</small>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-industry stat-icon"></i>
+                            <div>1,000+</div>
+                            <small>Unauthorized scrap yards</small>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="warning-box">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Major Concerns</h4>
+                    <ul>
+                        <li>70% of recycling done by informal sector</li>
+                        <li>Only 22 authorized recyclers for entire country</li>
+                        <li>5.5 kg per capita generation (2023)</li>
+                        <li>Projected to reach 5 MMT by 2030</li>
+                    </ul>
+                </div>
+            </div>
+    
+            <div class="content-card card-accent">
+                <div class="card-header">
+                    <i class="fas fa-recycle card-icon"></i>
+                    <h3>Government Initiatives</h3>
+                </div>
+                <div class="initiative-list">
+                    <div class="initiative-item">
+                        <h4><i class="fas fa-law"></i> E-Waste Rules 2022</h4>
+                        <p>Extended Producer Responsibility (EPR) mandates proper disposal by manufacturers</p>
+                    </div>
+                    
+                    <div class="initiative-item">
+                        <h4><i class="fas fa-rupee-sign"></i> Digital India Program</h4>
+                        <p>₹1,500 crore allocated for safe e-waste management infrastructure</p>
+                    </div>
+    
+                    <div class="initiative-item">
+                        <h4><i class="fas fa-building"></i> Urban Mining Centers</h4>
+                        <p>15 new facilities planned across metro cities by 2025</p>
+                    </div>
+                </div>
+    
+                <div class="comparison-box">
+                    <h4><i class="fas fa-balance-scale"></i> Recycling Comparison</h4>
+                    <div class="comparison-item">
+                        <div>Current Capacity</div>
+                        <div class="bar" style="width: 30%">3.8 Lakh MT</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div>Required Capacity</div>
+                        <div class="bar" style="width: 70%">11 Lakh MT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        :root {
+            --primary: #2E4C6D;
+            --secondary: #48BB78;
+            --accent: #FF6B6B;
+            --warning: #FFD93D;
+            --light: #F8F9FA;
+            --dark: #2D3436;
+        }
+        
+        /* Enhanced India Stat Section */
+        .india-stat {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .india-stat:hover {
+            transform: translateY(-3px);
+        }
+        
+        .india-stat:after {
+            content: "⚠";
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            opacity: 0.1;
+            font-size: 2rem;
+        }
+        
+        .india-stat .stat-number {
+            color: #E74C3C;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        
+        /* Modern Stat Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        .stat-item:hover {
+            background: var(--light);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        
+        .stat-icon {
+            color: var(--secondary);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: rgba(72, 187, 120, 0.1);
+            padding: 1rem;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Enhanced Warning Box */
+        .warning-box {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #FFECB3 0%, #FFE082 100%);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            position: relative;
+            margin: 2rem 0;
+            animation: pulseWarning 2s infinite;
+        }
+        
+        @keyframes pulseWarning {
+            0% { border-left-color: #FFE082; }
+            50% { border-left-color: var(--accent); }
+            100% { border-left-color: #FFE082; }
+        }
+        
+        .warning-box h4 {
+            color: #D84315;
+            margin: 0 0 1rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .warning-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .warning-box li {
+            padding: 0.5rem 0;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .warning-box li:before {
+            content: "•";
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+        }
+        
+        /* Modern Initiative List */
+        .initiative-list {
+            margin: 2rem 0;
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .initiative-item {
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary);
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .initiative-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .initiative-item i {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+        
+        /* Advanced Comparison Box */
+        .comparison-box {
+            margin-top: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+        
+        .comparison-item {
+            margin: 1.5rem 0;
+        }
+        
+        .bar {
+            background: linear-gradient(90deg, var(--secondary) 0%, #40A578 100%);
+            padding: 1rem;
+            color: white;
+            border-radius: 8px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .bar:after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255,255,255,0.2) 50%, 
+                transparent 100%);
+            animation: shine 1.5s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .initiative-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .bar {
+                font-size: 0.9rem;
+            }
+        }
+        </style>
+
+   <div id="calculator" class="content-section" style="display:none;">
+    <div class="section-header">
+        <h2 class="section-title">Carbon Footprint Calculator</h2>
+        <div class="title-decoration"></div>
+    </div>
+    
+    <div class="content-card calculator-card">
+        <div class="card-header">
+            <i class="fas fa-calculator card-icon"></i>
+            <h3>Estimate Your E-Waste Impact</h3>
+        </div>
+        
+        <div class="calculator-form">
+            <div class="form-group">
+                <label class="input-label">
+                    <i class="fas fa-laptop icon"></i>
+                    Device Type:
+                </label>
+                <select id="deviceType" class="styled-select">
+                    <option value="1.5">📱 Smartphone</option>
+                    <option value="5">💻 Laptop</option>
+                    <option value="3">📟 Tablet</option>
+                    <option value="8">🖥 Desktop Computer</option>
+                    <option value="2">⌚ Smart Watch</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="input-label">
+                    <i class="fas fa-clock icon"></i>
+                    Daily Usage Hours:
+                </label>
+                <input type="number" id="usageHours" class="styled-input" 
+                       placeholder="Enter hours (e.g. 5)" min="1" max="24">
+            </div>
+
+            <button class="calculate-btn" onclick="calculateFootprint()">
+                Calculate Footprint
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <div class="result-box" id="resultBox">
+            <div class="result-placeholder">
+                <i class="fas fa-leaf"></i>
+                <span>Your results will appear here</span>
+            </div>
+        </div>
+
+        <div class="savings-info" id="savingsInfo">
+            <div class="savings-header">
+                <i class="fas fa-recycle"></i>
+                <h3>Recycling Impact</h3>
+            </div>
+            <p id="savingsText" class="savings-text"></p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Shared Styles from Previous Design */
+.calculator-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-label {
+    display: block;
+    font-weight: 500;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.icon {
+    margin-right: 0.5rem;
+    color: #48bb78;
+}
+
+/* Form Elements */
+.styled-select, .styled-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.styled-select:focus, .styled-input:focus {
+    border-color: #48bb78;
+    outline: none;
+}
+
+/* Calculate Button */
+.calculate-btn {
+    background: #48bb78;
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.calculate-btn:hover {
+    background: #38a169;
+    transform: translateY(-2px);
+}
+
+/* Results Section */
+.result-box {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f0fff4;
+    border-radius: 8px;
+    text-align: center;
+    min-height: 100px;
+}
+
+.result-placeholder {
+    color: #718096;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Savings Info */
+.savings-info {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #ebf8ff;
+    border-radius: 8px;
+    border-left: 4px solid #48bb78;
+}
+
+.savings-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+.savings-text {
+    color: #4a5568;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .calculator-card {
+        padding: 1.5rem;
+    }
+    
+    .calculate-btn {
+        padding: 0.75rem;
+    }
+}
+</style>
+
+    <div id="facilityLocator" class="content-section" style="display:none;">
+        <h2>Facility Locator</h2>
+        <div class="map-controls">
+            <button onclick="focusOnCity('Chennai')">Chennai</button>
+            <button onclick="focusOnCity('Delhi')">Delhi</button>
+            <button onclick="focusOnCity('Coimbatore')">Coimbatore</button>
+            <button onclick="focusOnCity('Bangalore')">Bangalore</button>
+            <button onclick="focusOnCity('Hyderabad')">Hyderabad</button>
+        </div>
+        
+        <div class="route-controls">
+            <input type="text" id="startLocation" placeholder="Enter your location or address">
+            <button onclick="calculateRoute()">Find Route</button>
+            <button onclick="clearRoute()">Clear Route</button>
+        </div>
+        
+        <div id="map"></div>
+        
+        <h3>Available Collection Facilities</h3>
+        <div class="facility-list" id="facilityList"></div>
+    </div>
+    <div id="faqs" class="content-section" style="display:none;">
+        <div class="faq-container">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <div class="faq-intro">
+                <p>Get answers to common questions about electronic waste management and recycling. Learn how to responsibly dispose of your old devices and understand the impact of proper e-waste handling.</p>
+            </div>
+    
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-question-circle"></i>
+                    <h3>What exactly constitutes e-waste?</h3>
+                </div>
+                <div class="faq-answer">
+                    <p>E-waste (electronic waste) includes any discarded electrical or electronic devices. Common examples include:</p>
+                    <ul class="faq-list">
+                        <li><i class="fas fa-laptop"></i> Computers & laptops</li>
+                        <li><i class="fas fa-mobile-alt"></i> Smartphones & tablets</li>
+                        <li><i class="fas fa-tv"></i> Televisions & monitors</li>
+                        <li><i class="fas fa-print"></i> Printers & peripherals</li>
+                        <li><i class="fas fa-battery-full"></i> Batteries & power banks</li>
+                        <li><i class="fas fa-gamepad"></i> Gaming consoles</li>
+                        <li><i class="fas fa-blender-phone"></i> Small kitchen appliances</li>
+                    </ul>
+                </div>
+            </div>
+    
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-biohazard"></i>
+                    <h3>Why is improper e-waste disposal dangerous?</h3>
+                </div>
+                <div class="faq-answer">
+                    <p>E-waste contains numerous toxic substances that pose significant environmental and health risks:</p>
+                    <div class="toxin-grid">
+                        <div class="toxin-card">
+                            <h4>Lead <span class="toxin-percent">(~40% of e-waste)</span></h4>
+                            <p>Damages nervous systems and causes developmental issues in children</p>
+                        </div>
+                        <div class="toxin-card">
+                            <h4>Mercury <span class="toxin-percent">(3000 tons/year)</span></h4>
+                            <p>Contaminates water supplies and causes neurological damage</p>
+                        </div>
+                        <div class="toxin-card">
+                            <h4>Cadmium <span class="toxin-percent">(22% of exposure)</span></h4>
+                            <p>Accumulates in kidneys and liver, causing organ failure</p>
+                        </div>
+                    </div>
+                    <p class="warning-note"><i class="fas fa-exclamation-triangle"></i> When burned or landfilled, these toxins release dioxins that can travel up to 25 miles through air currents.</p>
+                </div>
+            </div>
+    
+            <!-- Additional improved FAQ items -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-recycle"></i>
+                    <h3>What's the proper way to recycle e-waste?</h3>
+                </div>
+                <div class="faq-answer">
+                    <p>Follow our certified 4-step process:</p>
+                    <ol class="process-steps">
+                        <li><strong>Data Sanitization:</strong> Use certified software to wipe all personal data</li>
+                        <li><strong>Component Separation:</strong> Remove batteries and hazardous materials</li>
+                        <li><strong>Certified Recycling:</strong> Use our <a href="#locator" class="cta-link">Facility Locator</a> to find R2-certified centers</li>
+                        <li><strong>Documentation:</strong> Request a certificate of destruction for records</li>
+                    </ol>
+                    <div class="recycling-stats">
+                        <div class="stat-box">
+                            <div class="stat-number">85%</div>
+                            <div class="stat-label">Recoverable Materials</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">50+</div>
+                            <div class="stat-label">Certified Partners</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <!-- More FAQ items with expanded content -->
+            <div class="faq-item">
+                <div class="faq-question">
+                    <i class="fas fa-lock"></i>
+                    <h3>How is data security handled during recycling?</h3>
+                </div>
+                <div class="faq-answer">
+                    <p>Certified recyclers follow NIST 800-88 standards for data destruction:</p>
+                    <ul class="security-list">
+                        <li>Physical destruction of storage media</li>
+                        <li>3-pass DoD wiping for reusable drives</li>
+                        <li>Encrypted data log documentation</li>
+                        <li>Chain-of-custody tracking</li>
+                    </ul>
+                    <p class="cert-note"><i class="fas fa-shield-alt"></i> All partners maintain ISO 27001 information security certification</p>
+                </div>
+            </div>
+    
+            <div class="faq-callout">
+                <h3>Need Immediate Assistance?</h3>
+                <p>Contact our e-waste specialists: 
+                    <span class="contact-info"><i class="fas fa-phone"></i> 1-800-ECO-WASTE</span>
+                    <span class="contact-info"><i class="fas fa-envelope"></i> recycle@ewasteportal.com</span>
+                </p>
+                <button class="cta-button">Schedule Pickup Now</button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+    /* Comprehensive styling */
+    .faq-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    
+    .section-title {
+        color: #2c5432;
+        font-size: 2.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .faq-item {
+        background: white;
+        margin: 1.5rem 0;
+        border-radius: 8px;
+        transition: transform 0.2s;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .faq-item:hover {
+        transform: translateY(-3px);
+    }
+    
+    .faq-question {
+        padding: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: #f1f8e9;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .faq-question h3 {
+        margin: 0;
+        color: #3a7a40;
+        font-size: 1.25rem;
+    }
+    
+    .faq-answer {
+        padding: 1.5rem;
+        border-top: 2px solid #e0e0e0;
+    }
+    
+    .faq-list {
+        columns: 2;
+        list-style: none;
+        padding: 0;
+    }
+    
+    .faq-list li {
+        padding: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .toxin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 1rem 0;
+    }
+    
+    .toxin-card {
+        background: #fff5f5;
+        padding: 1rem;
+        border-radius: 6px;
+        border-left: 4px solid #c62828;
+    }
+    
+    .process-steps {
+        counter-reset: step;
+        padding-left: 2rem;
+    }
+    
+    .process-steps li {
+        margin: 1rem 0;
+        position: relative;
+    }
+    
+    .process-steps li::before {
+        counter-increment: step;
+        content: counter(step);
+        position: absolute;
+        left: -2.5rem;
+        top: -0.25rem;
+        background: #3a7a40;
+        color: white;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .faq-callout {
+        background: #3a7a40;
+        color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+        margin-top: 2rem;
+    }
+    
+    .cta-button {
+        background: #ffd600;
+        color: #2c5432;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .cta-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .faq-list {
+            columns: 1;
+        }
+        
+        .toxin-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
+    
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script>
+        // Add this graph structure at the top of the script section
+        const cityGraph = {
+            'Chennai': {
+                'Bangalore': 300,
+                'Hyderabad': 500,
+                'Coimbatore': 200
+            },
+            'Bangalore': {
+                'Chennai': 300,
+                'Hyderabad': 500,
+                'Coimbatore': 250,
+                'Delhi': 1750
+            },
+            'Hyderabad': {
+                'Chennai': 500,
+                'Bangalore': 500,
+                'Delhi': 1250
+            },
+            'Delhi': {
+                'Hyderabad': 1250,
+                'Bangalore': 1750,
+                'Coimbatore': 2000
+            },
+            'Coimbatore': {
+                'Chennai': 200,
+                'Bangalore': 250
+            }
+        };
+        
+        // Dijkstra's algorithm implementation
+        function dijkstra(graph, start, end) {
+            const distances = {};
+            const previous = {};
+            const nodes = new Set();
+            const path = [];
+            let smallest;
+            
+            // Initialize distances
+            for (let node in graph) {
+                distances[node] = node === start ? 0 : Infinity;
+                nodes.add(node);
+            }
+            
+            while (nodes.size) {
+                // Find smallest distance node
+                smallest = null;
+                for (let node of nodes) {
+                    if (!smallest || distances[node] < distances[smallest]) {
+                        smallest = node;
+                    }
+                }
+                
+                if (smallest === end) break;
+                
+                // Update neighbor distances
+                for (let neighbor in graph[smallest]) {
+                    const alt = distances[smallest] + graph[smallest][neighbor];
+                    if (alt < distances[neighbor]) {
+                        distances[neighbor] = alt;
+                        previous[neighbor] = smallest;
+                    }
+                }
+                nodes.delete(smallest);
+            }
+            
+            // Build path
+            let current = end;
+            while (previous[current]) {
+                path.unshift(current);
+                current = previous[current];
+            }
+            path.unshift(start);
+            
+            return {
+                distance: distances[end],
+                path: path
+            };
+        }
+        
+        // Modified calculateRoute function to use Dijkstra's algorithm
+        function calculateRoute() {
+            if (!selectedFacility) {
+                alert('Please select a facility first by clicking on it in the list or map');
+                return;
+            }
+            
+            const startLocation = document.getElementById('startLocation').value.trim();
+            if (!startLocation) {
+                alert('Please enter your starting location');
+                return;
+            }
+        
+            // Geocode the start location
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(startLocation)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) throw new Error('Location not found');
+                    
+                    // Get nearest major city from coordinates
+                    const startCity = findNearestCity([data[0].lat, data[0].lon]);
+                    const endCity = findNearestCity(selectedFacility.coordinates);
+                    
+                    // Calculate optimal path using Dijkstra's
+                    const result = dijkstra(cityGraph, startCity, endCity);
+                    
+                    // Show algorithm results
+                    const routeInfo = `Optimal route using Dijkstra's algorithm:
+                        Path: ${result.path.join(' → ')}
+                        Total distance: ${result.distance} km`;
+                    
+                    // Update routing display
+                    updateRouteDisplay(result.path);
+                    
+                    // Show actual route on map
+                    calculateActualRoute(data[0], selectedFacility.coordinates, routeInfo);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Could not calculate route: ' + error.message);
+                });
+        }
+        
+        // Helper function to find nearest major city
+        function findNearestCity(coords) {
+            const cities = {
+                'Chennai': [13.0827, 80.2707],
+                'Bangalore': [12.9716, 77.5946],
+                'Hyderabad': [17.3850, 78.4867],
+                'Delhi': [28.6139, 77.2090],
+                'Coimbatore': [11.0168, 76.9558]
+            };
+            
+            let nearestCity = '';
+            let minDistance = Infinity;
+            
+            for (const [city, cityCoords] of Object.entries(cities)) {
+                const dist = Math.sqrt(
+                    Math.pow(coords[0] - cityCoords[0], 2) + 
+                    Math.pow(coords[1] - cityCoords[1], 2)
+                );
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    nearestCity = city;
+                }
+            }
+            return nearestCity;
+        }
+        
+        // Function to update the display with Dijkstra's results
+        function updateRouteDisplay(path) {
+            const routeDisplay = document.createElement('div');
+            routeDisplay.style.marginTop = '10px';
+            routeDisplay.style.padding = '10px';
+            routeDisplay.style.backgroundColor = '#e8f5e9';
+            routeDisplay.innerHTML = `
+                <strong>Algorithm Results:</strong><br>
+                Path: ${path.join(' → ')}<br>
+                This result is calculated using Dijkstra's shortest path algorithm
+            `;
+            
+            const facilityLocator = document.getElementById('facilityLocator');
+            facilityLocator.insertBefore(routeDisplay, document.getElementById('map'));
+        }
+        
+        // Modified function to handle actual routing
+        function calculateActualRoute(startData, endCoords, routeInfo) {
+            // Clear existing route
+            if (routingControl) {
+                map.removeControl(routingControl);
+                routingControl = null;
+            }
+        
+            // Create new route
+            routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(startData.lat, startData.lon),
+                    L.latLng(endCoords[0], endCoords[1])
+                ],
+                routeWhileDragging: true,
+                lineOptions: {styles: [{color: '#6d9b6f', weight: 5}]}
+            }).addTo(map);
+        }
+    
+        // Global variables
+        let map;
+        let routingControl = null;
+        let facilities = [];
+        let selectedFacility = null;
+        
+        // Facility data - in a real app, this would come from a database
+        const facilityData = {
+    "Hyderabad": [
+        // Existing location (5)
+        {
+            id: 5,
+            name: "Hyderabad E-Waste Facility",
+            address: "56, Hi-Tech City Road",
+            phone: "9876543213",
+            coordinates: [17.3850, 78.4867],
+            hours: "Mon-Sat: 9AM-6PM"
+        },
+        // New Hyderabad locations
+        {
+            id: 31,
+            name: "Gachibowli Recycling Center",
+            address: "Mindspace Circle, Gachibowli",
+            phone: "9123456789",
+            coordinates: [17.4400, 78.3900],
+            hours: "Mon-Sun: 7AM-9PM"
+        },
+        {
+            id: 32,
+            name: "Secunderabad E-Waste Hub",
+            address: "SP Road, Secunderabad",
+            phone: "8012345678",
+            coordinates: [17.4399, 78.4983],
+            hours: "Mon-Sat: 8:30AM-7:30PM"
+        },
+        {
+            id: 33,
+            name: "Kukatpally Scrap Collection",
+            address: "KPHB Colony Phase 5",
+            phone: "9848123456",
+            coordinates: [17.4849, 78.4136],
+            hours: "Mon-Fri: 9AM-8PM"
+        },
+        {
+            id: 34,
+            name: "Banjara Hills Eco Station",
+            address: "Road No. 12, Banjara Hills",
+            phone: "7301234567",
+            coordinates: [17.4150, 78.4470],
+            hours: "Mon-Sat: 8AM-6PM"
+        },
+        {
+            id: 35,
+            name: "Mehdipatnam Recycling Unit",
+            address: "NH 44, Mehdipatnam",
+            phone: "9876543214",
+            coordinates: [17.3854, 78.4485],
+            hours: "Mon-Sun: 6AM-10PM"
+        }
+    ],
+    "Coimbatore": [
+        // Existing location (3)
+        {
+            id: 3,
+            name: "Coimbatore E-Waste Hub",
+            address: "34, DB Road",
+            phone: "9876543211",
+            coordinates: [11.0168, 76.9558],
+            hours: "Mon-Sat: 8:30AM-6:30PM"
+        },
+        // New Coimbatore locations
+        {
+            id: 36,
+            name: "Peelamedu Recycling Center",
+            address: "Avinashi Road, Peelamedu",
+            phone: "9443123456",
+            coordinates: [11.0225, 76.9667],
+            hours: "Mon-Sat: 8AM-8PM"
+        },
+        {
+            id: 37,
+            name: "Gandhipuram E-Scrap Point",
+            address: "100 Feet Road, Gandhipuram",
+            phone: "8220123456",
+            coordinates: [11.0061, 76.9614],
+            hours: "Mon-Fri: 9AM-7PM"
+        },
+        {
+            id: 38,
+            name: "Saibaba Colony Eco Hub",
+            address: "Mettupalayam Road",
+            phone: "7373123456",
+            coordinates: [11.0190, 76.9478],
+            hours: "Mon-Sun: 7:30AM-9PM"
+        },
+        {
+            id: 39,
+            name: "Singanallur Collection Center",
+            address: "Trichy Road, Singanallur",
+            phone: "9756843210",
+            coordinates: [10.9915, 77.0150],
+            hours: "Mon-Sat: 8:30AM-6PM"
+        },
+        {
+            id: 40,
+            name: "Saravanampatti E-Waste Facility",
+            address: "Thadagam Road, Saravanampatti",
+            phone: "6363123456",
+            coordinates: [11.0650, 76.9444],
+            hours: "Mon-Fri: 8AM-5PM"
+        }
+    ],
+
+    "Chennai": [
+        // Existing locations (1-11)
+        // New additions:
+        {
+            id: 16,
+            name: "Chennai E-Waste Management Hub",
+            address: "15, Sardar Patel Rd, Guindy",
+            phone: "9445123456",
+            coordinates: [13.0100, 80.2125],
+            hours: "Mon-Sat: 8AM-8PM"
+        },
+        {
+            id: 17,
+            name: "T. Nagar Recycling Center",
+            address: "78, North Usman Road, T. Nagar",
+            phone: "8765432190",
+            coordinates: [13.0344, 80.2305],
+            hours: "Mon-Sat: 9:30AM-6:30PM"
+        },
+        {
+            id: 18,
+            name: "Adyar Eco Station",
+            address: "1st Main Road, Adyar",
+            phone: "9894123456",
+            coordinates: [13.0060, 80.2572],
+            hours: "Mon-Fri: 8AM-7PM"
+        },
+        {
+            id: 19,
+            name: "Ambattur Industrial E-Waste",
+            address: "Ambattur Industrial Estate",
+            phone: "9444467890",
+            coordinates: [13.0987, 80.1618],
+            hours: "Mon-Sat: 8:30AM-5:30PM"
+        },
+        {
+            id: 20,
+            name: "Pallavaram Scrap Collection",
+            address: "GST Road, Pallavaram",
+            phone: "9876543210",
+            coordinates: [12.9675, 80.1494],
+            hours: "Mon-Sun: 7AM-9PM"
+        }
+    ],
+    "Delhi": [
+        // Existing locations (6-13)
+        // New additions:
+        {
+            id: 21,
+            name: "Okhla E-Waste Plant",
+            address: "Okhla Industrial Area Phase III",
+            phone: "9812345670",
+            coordinates: [28.5315, 77.2734],
+            hours: "Mon-Sat: 8AM-6PM"
+        },
+        {
+            id: 22,
+            name: "Rohini Recycling Center",
+            address: "Sector 24, Rohini",
+            phone: "9876123456",
+            coordinates: [28.7234, 77.1234],
+            hours: "Mon-Fri: 9AM-7PM"
+        },
+        {
+            id: 23,
+            name: "Dwarka E-Scrap Collection",
+            address: "Sector 12 Market, Dwarka",
+            phone: "8800012345",
+            coordinates: [28.5843, 77.0490],
+            hours: "Mon-Sun: 8AM-8PM"
+        },
+        {
+            id: 24,
+            name: "Mayapuri Scrap Market",
+            address: "Mayapuri Industrial Area",
+            phone: "9212345678",
+            coordinates: [28.6295, 77.1254],
+            hours: "Mon-Sat: 10AM-8PM"
+        },
+        {
+            id: 25,
+            name: "Noida E-Waste Facility",
+            address: "Sector 62, Noida",
+            phone: "9876543219",
+            coordinates: [28.6260, 77.3653],
+            hours: "Mon-Fri: 8:30AM-5:30PM"
+        }
+    ],
+    "Bangalore": [
+        // Existing locations (4,14-15)
+        // New additions:
+        {
+            id: 26,
+            name: "Electronic City Recycling Hub",
+            address: "Phase 1, Electronic City",
+            phone: "8022123456",
+            coordinates: [12.8456, 77.6603],
+            hours: "Mon-Sat: 7:30AM-7:30PM"
+        },
+        {
+            id: 27,
+            name: "Indiranagar E-Waste Collection",
+            address: "100 Feet Road, Indiranagar",
+            phone: "8044456789",
+            coordinates: [12.9789, 77.6402],
+            hours: "Mon-Sun: 9AM-9PM"
+        },
+        {
+            id: 28,
+            name: "Whitefield Recycling Center",
+            address: "ITPL Road, Whitefield",
+            phone: "9900012345",
+            coordinates: [12.9698, 77.7499],
+            hours: "Mon-Fri: 8AM-8PM"
+        },
+        {
+            id: 29,
+            name: "Jayanagar E-Scrap Point",
+            address: "4th Block, Jayanagar",
+            phone: "9845123456",
+            coordinates: [12.9308, 77.5833],
+            hours: "Mon-Sat: 8:30AM-6:30PM"
+        },
+        {
+            id: 30,
+            name: "Marathahalli E-Waste Facility",
+            address: "Outer Ring Road, Marathahalli",
+            phone: "6363123456",
+            coordinates: [12.9592, 77.6974],
+            hours: "Mon-Sun: 7AM-10PM"
+        }
+    ],
+    // Other cities remain unchanged
+};
+        // Initialize the application when DOM is loaded
+        document.addEventListener("DOMContentLoaded", () => {
+            initMap();
+            showSection('home');
+        });
+
+        function initMap() {
+            // Initialize the map centered on India
+            map = L.map('map').setView([20.5937, 78.9629], 5);
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Add markers for all facilities
+            Object.values(facilityData).forEach(cityFacilities => {
+                cityFacilities.forEach(facility => {
+                    const marker = L.marker(facility.coordinates).addTo(map);
+                    marker.bindPopup(`
+                        <b>${facility.name}</b><br>
+                        ${facility.address}<br>
+                        Phone: ${facility.phone}<br>
+                        Hours: ${facility.hours}
+                    `);
+                    
+                    // Store facility reference with marker
+                    marker.facility = facility;
+                    
+                    // Add click handler to select facility
+                    marker.on('click', function() {
+                        selectFacility(facility);
+                    });
+                });
+            });
+            
+            // Initialize facilities array
+            facilities = Object.values(facilityData).flat();
+            
+            // Populate facility list
+            updateFacilityList(facilities);
+        }
+
+        function focusOnCity(city) {
+            const cityCoordinates = {
+                "Chennai": [13.0827, 80.2707],
+                "Coimbatore": [11.0168, 76.9558],
+                "Bangalore": [12.9716, 77.5946],
+                "Hyderabad": [17.3850, 78.4867],
+                "Delhi" :[28.6139, 77.2]
+
+            };
+            
+            if (cityCoordinates[city]) {
+                map.setView(cityCoordinates[city], 12);
+                
+                // Filter facilities for this city
+                const cityFacilities = facilityData[city] || [];
+                updateFacilityList(cityFacilities);
+            }
+        }
+
+        function updateFacilityList(facilitiesToShow) {
+            const facilityList = document.getElementById('facilityList');
+            facilityList.innerHTML = '';
+            
+            facilitiesToShow.forEach(facility => {
+                const item = document.createElement('div');
+                item.className = 'facility-item';
+                if (selectedFacility && selectedFacility.id === facility.id) {
+                    item.classList.add('active');
+                }
+                item.innerHTML = `
+                    <strong>${facility.name}</strong>
+                    <div class="facility-details">
+                        ${facility.address}<br>
+                        Phone: ${facility.phone}<br>
+                        Hours: ${facility.hours}
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    selectFacility(facility);
+                });
+                
+                facilityList.appendChild(item);
+            });
+        }
+
+        function selectFacility(facility) {
+            selectedFacility = facility;
+            
+            // Highlight in list
+            updateFacilityList(facilities);
+            
+            // Center map on facility
+            map.setView(facility.coordinates, 15);
+            
+            // Open popup
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker && layer.facility && layer.facility.id === facility.id) {
+                    layer.openPopup();
+                }
+            });
+        }
+
+        function calculateRoute() {
+    if (!selectedFacility) {
+        alert('Please select a facility first by clicking on it in the list or map');
+        return;
+    }
+    
+    const startLocation = document.getElementById('startLocation').value.trim();
+    if (!startLocation) {
+        alert('Please enter your starting location');
+        return;
+    }
+
+    // Clear any existing route
+    if (routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+    }
+
+    // Geocode the start location using Nominatim API
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(startLocation)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length === 0) {
+                throw new Error('Location not found');
+            }
+            
+            const startCoords = [
+                parseFloat(data[0].lat),
+                parseFloat(data[0].lon)
+            ];
+            
+            // Add new route with actual coordinates
+            routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(startCoords[0], startCoords[1]),
+                    L.latLng(selectedFacility.coordinates[0], selectedFacility.coordinates[1])
+                ],
+                routeWhileDragging: true,
+                showAlternatives: false,
+                addWaypoints: false,
+                draggableWaypoints: false,
+                fitSelectedRoutes: true,
+                lineOptions: {
+                    styles: [{color: '#6d9b6f', opacity: 0.7, weight: 5}]
+                },
+                show: true
+            }).addTo(map);
+
+            // Add error handling for routing
+            routingControl.on('routingerror', (err) => {
+                console.error('Routing error:', err);
+                alert('Could not calculate route. Please check your start location.');
+            });
+        })
+        .catch(error => {
+            console.error('Geocoding error:', error);
+            alert('Could not find location. Please enter a valid address.');
+        });
+}
+
+        function simulateRouteOptimization(start, end) {
+            // In a real application, this would implement the Bellman-Ford algorithm
+            // to find the optimal route considering various factors like traffic, distance, etc.
+            // For this demo, we'll just show a message
+            
+            const distance = Math.sqrt(
+                Math.pow(end[0] - start[0], 2) + 
+                Math.pow(end[1] - start[1], 2)
+            ) * 111; // Convert to kilometers (approx)
+            
+            setTimeout(() => {
+                alert('Optimal route calculated using advanced algorithms.\nEstimated distance: ${distance.toFixed(1)} km');
+            }, 1000);
+        }
+
+        function clearRoute() {
+            if (routingControl) {
+                map.removeControl(routingControl);
+                routingControl = null;
+            }
+            document.getElementById('startLocation').value = '';
+        }
+
+        function showSection(id) {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(sec => sec.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+            
+            // If showing map section, trigger a small resize to ensure proper rendering
+            if (id === 'facilityLocator') {
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100);
+            }
+        }
+
+        function calculateFootprint() {
+            const deviceType = parseFloat(document.getElementById("deviceType").value);
+            const usage = parseFloat(document.getElementById("usageHours").value);
+            
+            if (!isNaN(deviceType) && !isNaN(usage)) {
+                const  carbon = (deviceType * usage * 0.05).toFixed(2);
+                document.getElementById("resultBox").innerHTML = `Estimated daily carbon footprint: <strong>${carbon} kg CO₂</strong>`;
+                document.getElementById("resultBox").style.display = 'block';
+                
+                // Show recycling impact information
+                const savings = (deviceType * 0.8).toFixed(2); // 80% of device weight is recoverable
+                document.getElementById("savingsText").innerHTML = `
+                    By recycling this device, you could save approximately <strong>${savings} kg</strong> of materials from going to landfill.
+                    This prevents about <strong>${(carbon * 365 * 0.3).toFixed(1)} kg</strong> of CO₂ emissions annually.
+                `;
+                document.getElementById("savingsInfo").style.display = 'block';
+            } else {
+                alert("Please enter valid numbers for all fields");
+            }
+        }
+    </script>
+</body>
+</html>
